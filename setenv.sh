@@ -3,7 +3,7 @@
 > setenv
 
 cwd=`pwd`
-if [ ! -e toppar_drude ]; then tar -xzf toppar_drude.tgz; fi
+#if [ ! -e toppar_drude ]; then tar -xzf toppar_drude.tgz; fi
 if [ ! -e toppar_c36 ]; then tar -xzf toppar_c36.tgz; fi
 
 charmm=`which charmm`
@@ -20,5 +20,6 @@ if [ $C == 3 ]; then
 else
     echo "Incorrect path!!! please try again"; exit
 fi; rm tempi tempo
+echo -e "\n-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-\n"
 
 exit

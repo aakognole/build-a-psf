@@ -3,6 +3,11 @@
 cwd=`pwd`
 if [ -e setenv ]; then source setenv; else ./setenv.sh; source setenv; fi
 
+if [ ! ${1} ]; then
+    echo "Usage: ./run <resid> "
+    exit
+fi
+
 mkdir -p output
 
 ${CHARMMDIR}/charmm -i 01_build_psf.inp resi=${1} > 01_build_psf.out
