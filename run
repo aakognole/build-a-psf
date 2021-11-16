@@ -1,0 +1,45 @@
+#!/bin/bash
+
+cwd=`pwd`
+if [ -e setenv ]; then source setenv; else ./setenv.sh; source setenv; fi
+
+mkdir -p output
+
+${CHARMMDIR}/charmm -i 01_build_psf.inp resi=${1} > 01_build_psf.out
+
+atom1=`grep angles -A 1 output/${1}.c36.psf | tail -n 1 | awk '{print $1}'`
+atom2=`grep angles -A 1 output/${1}.c36.psf | tail -n 1 | awk '{print $2}'`
+atom3=`grep angles -A 1 output/${1}.c36.psf | tail -n 1 | awk '{print $3}'`
+
+${CHARMMDIR}/charmm -i 021_build_pdb.inp resi=${1} atom1=${atom1} atom2=${atom2} atom3=${atom3} > 02_build_pdb.out
+
+flag=`tail -n 6 02_build_pdb.out | head -n 1 | awk '{print $1}'`
+if [ $flag == "ABNORMAL" ]; then
+    atoms=`grep NATOM output/${1}.c36.psf | awk '{print $1}'`
+    echo "------------------------------------------------------------------------------"
+    grep NATOM -A ${atoms} output/${1}.c36.psf | tail -n ${atoms} | awk '{print $1,$5}'
+    echo "------------------------------------------------------------------------------
+SEED atom atom atom - Place first three atoms for building reference
+
+      When the cartesian coordinates are not specified for any atoms,
+the BUILd command cannot be used to generate positions since all positions
+are determined relative to known positions. The SEED command specifies the
+positions of the three atoms . It puts the first at the origin, the second
+on the x-axis, and the third in the xy-plane. The three atoms must have
+entries in the IC file corresponding to: dist 1-2, angle 1-2-3, dist 2-3.
+
+------------------------------------------------------------------------------"
+    echo "enter name of first atom"
+    read atom1
+    echo "enter name of second atom"
+    read atom2
+    echo "enter name of third atom"
+    read atom3
+    ${CHARMMDIR}/charmm -i 022_build_pdb_name.inp resi=${1} atom1=${atom1} atom2=${atom2} atom3=${atom3} > 02_build_pdb.out
+    flag=`tail -n 6 02_build_pdb.out | head -n 1 | awk '{print $1}'`
+    if [ $flag == "ABNORMAL" ]; then
+	echo "Failed!"
+    fi
+fi
+
+exit

@@ -1,0 +1,15 @@
+*generate psf for small molecule 
+*
+
+! Get cgenff parameters
+stream toppar_c36.str
+
+read sequ @resi 1
+
+gene @resi setup warn
+
+write psf card name output/@resi.c36.psf
+
+define system sele all show end 
+
+stop

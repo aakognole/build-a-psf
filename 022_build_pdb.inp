@@ -1,0 +1,26 @@
+*generate coordinates from IC table 
+*
+
+! Get cgenff parameters
+stream toppar_c36.str
+
+!read psf card name output/@resi.c36.psf
+
+read sequ @resi 1
+
+gene @resi setup warn
+
+ic param
+ic seed 1 @atom1 1 @atom2 1 @atom3
+!ic seed bynu @atom1 bynu @atom2 bynu @atom3
+ic build
+
+mini sd 50
+
+coor orient
+coor print
+
+write coor card name output/@resi.c36.crd
+write coor pdb name output/@resi.c36.pdb
+
+stop
