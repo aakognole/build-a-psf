@@ -1,26 +1,47 @@
 *generate coordinates from IC table 
 *
 
-! Get cgenff parameters
-stream toppar_c36.str
+if @method eq c36 then
+    stream toppar_c36.str
+    read sequ @resi 1
+    gene @resi setup warn
 
-!read psf card name output/@resi.c36.psf
+    ic param
+    ic seed 1 @atom1 1 @atom2 1 @atom3
+    !ic seed bynu @atom1 bynu @atom2 bynu @atom3
+    ic build
 
-read sequ @resi 1
+    mini sd 50
 
-gene @resi setup warn
+    coor orient
+    coor print
 
-ic param
-ic seed 1 @atom1 1 @atom2 1 @atom3
-!ic seed bynu @atom1 bynu @atom2 bynu @atom3
-ic build
+    write coor card name output/@resi.c36.crd
+    write coor pdb name output/@resi.c36.pdb
+endif
+if @method eq drude then
+    stream toppar_drude.str
+    read sequ @resi 1
+    gene @resi setup warn drude dmass 0.4
 
-mini sd 50
+    bomlev -1
+    ic param
+    ic seed 1 @atom1 1 @atom2 1 @atom3
+    !ic seed bynu @atom1 bynu @atom2 bynu @atom3
+    ic build
 
-coor orient
-coor print
+    coor sdrude
+    coor shake
+    coor print
+    bomlev 0
+    
+    mini sd 50
 
-write coor card name output/@resi.c36.crd
-write coor pdb name output/@resi.c36.pdb
+    coor orient
+    coor print
+
+    write coor card name output/@resi.drude.crd
+    write coor pdb name output/@resi.drude.pdb
+endif
 
 stop

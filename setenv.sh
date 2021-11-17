@@ -3,13 +3,15 @@
 > setenv
 
 cwd=`pwd`
-#if [ ! -e toppar_drude ]; then tar -xzf toppar_drude.tgz; fi
+cd toppar
+if [ ! -e toppar_drude ]; then tar -xzf toppar_drude.tgz; fi
 if [ ! -e toppar_c36 ]; then tar -xzf toppar_c36.tgz; fi
+cd ..
 
 charmm=`which charmm`
 if [ $charmm ]; then
-    printf "Found path to charmm binary CHARMMDIR = ${charmm:0:-7}\n"
-    printf "Press ENTER to continue or specify path \n>>> "
+    printf "\nFound path to charmm binary CHARMMDIR = ${charmm:0:-7}\n"
+    printf "\nPress ENTER to continue or specify path \n>>> "
 else
     printf "Enter path to charmm binary i.e. \${CHARMMDIR}/charmm\n>>> "
 fi

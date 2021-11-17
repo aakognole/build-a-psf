@@ -3,26 +3,44 @@
 cwd=`pwd`
 if [ -e setenv ]; then source setenv; else ./setenv.sh; source setenv; fi
 
-if [ ! ${1} ]; then
-    echo "Usage: ./run <resid> "
+if [ ! ${1} ] || [ ! ${2} ]; then
+    echo "Usage: ./run <drude/c36> <resid> e.g. ./run c36 benz"
     exit
 fi
 
 mkdir -p output
 
-${CHARMMDIR}/charmm -i 01_build_psf.inp resi=${1} > 01_build_psf.out
-
-atom1=`grep angles -A 1 output/${1}.c36.psf | tail -n 1 | awk '{print $1}'`
-atom2=`grep angles -A 1 output/${1}.c36.psf | tail -n 1 | awk '{print $2}'`
-atom3=`grep angles -A 1 output/${1}.c36.psf | tail -n 1 | awk '{print $3}'`
-
-${CHARMMDIR}/charmm -i 021_build_pdb.inp resi=${1} atom1=${atom1} atom2=${atom2} atom3=${atom3} > 02_build_pdb.out
+printf "\n>>> building psf ..."
+${CHARMMDIR}/charmm -i 01_build_psf.inp method=${1} resi=${2} > 01_build_psf.out
+flag=`tail -n 6 01_build_psf.out | head -n 1 | awk '{print $1}'`
+if [ $flag == "ABNORMAL" ]; then
+    printf " failed! Check 01_build_psf.out for errors! \n"
+    exit
+else
+    printf " success!\n"
+fi
+if [ ${1} == 'c36' ]; then
+    atom1=`grep angles -A 1 output/${2}.c36.psf | tail -n 1 | awk '{print $1}'`
+    atom2=`grep angles -A 1 output/${2}.c36.psf | tail -n 1 | awk '{print $2}'`
+    atom3=`grep angles -A 1 output/${2}.c36.psf | tail -n 1 | awk '{print $3}'`
+    atoms=`grep NATOM output/${2}.c36.psf | awk '{print $1}'`
+elif [ ${1} == 'drude' ]; then
+    atom1=`grep angles -A 1 output/${2}.drude.psf | tail -n 1 | awk '{print $1}'`
+    atom2=`grep angles -A 1 output/${2}.drude.psf | tail -n 1 | awk '{print $2}'`
+    atom3=`grep angles -A 1 output/${2}.drude.psf | tail -n 1 | awk '{print $3}'`
+    atoms=`grep NATOM output/${2}.drude.psf | awk '{print $1}'`
+fi
+printf "\n>>> building pdb ..."
+${CHARMMDIR}/charmm -i 021_build_pdb.inp method=${1} resi=${2} atom1=${atom1} atom2=${atom2} atom3=${atom3} > 02_build_pdb.out
 
 flag=`tail -n 6 02_build_pdb.out | head -n 1 | awk '{print $1}'`
 if [ $flag == "ABNORMAL" ]; then
-    atoms=`grep NATOM output/${1}.c36.psf | awk '{print $1}'`
-    echo "------------------------------------------------------------------------------"
-    grep NATOM -A ${atoms} output/${1}.c36.psf | tail -n ${atoms} | awk '{print $1,$5}'
+    printf "\n------------------------------------------------------------------------------\n"
+    if [ ${1} == 'c36' ]; then
+	grep NATOM -A ${atoms} output/${2}.c36.psf | tail -n ${atoms} | awk '{print $1,$5}'
+    elif [ ${1} == 'drude' ]; then
+	grep NATOM -A ${atoms} output/${2}.drude.psf | tail -n ${atoms} | awk '{print $1,$5}'
+    fi
     echo "------------------------------------------------------------------------------
 SEED atom atom atom - Place first three atoms for building reference
 
@@ -40,11 +58,16 @@ entries in the IC file corresponding to: dist 1-2, angle 1-2-3, dist 2-3.
     read atom2
     echo "enter name of third atom"
     read atom3
-    ${CHARMMDIR}/charmm -i 022_build_pdb_name.inp resi=${1} atom1=${atom1} atom2=${atom2} atom3=${atom3} > 02_build_pdb.out
+    echo "------------------------------------------------------------------------------"
+    printf "\n>>> building pdb ..."
+    ${CHARMMDIR}/charmm -i 022_build_pdb.inp method=${1} resi=${2} atom1=${atom1} atom2=${atom2} atom3=${atom3} > 02_build_pdb.out
     flag=`tail -n 6 02_build_pdb.out | head -n 1 | awk '{print $1}'`
     if [ $flag == "ABNORMAL" ]; then
-	echo "Failed!"
+	printf " failed! Check 02_build_pdb.out for errors!\n"
+	exit
     fi
 fi
+printf " success!\n"
+printf "\n>>> Your psf, crd and pdb files are in the output directory!\n\n"
 
 exit

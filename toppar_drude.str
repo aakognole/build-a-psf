@@ -1,0 +1,5 @@
+stream ./toppar/toppar_drude/toppar_drude_master_protein_2020b.str
+stream ./toppar/toppar_drude/toppar_drude_nucleic_acid_2020b.str
+stream ./toppar/toppar_drude/toppar_drude_lipid_2020b.str
+!stream ./toppar/toppar_drude/toppar_drude_carbohydrate_2020b.str
+stream ./toppar/toppar_drude/toppar_drude_model_2020b.str

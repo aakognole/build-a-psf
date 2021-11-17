@@ -1,15 +1,20 @@
 *generate psf for small molecule 
 *
 
-! Get cgenff parameters
-stream toppar_c36.str
+if @method eq c36 then 
+    stream toppar_c36.str
+    read sequ @resi 1
+    gene @resi setup warn
+    write psf card name output/@resi.c36.psf
+endif
 
-read sequ @resi 1
+if @method eq drude then
+    stream toppar_drude.str
+    read sequ @resi 1
+    gene @resi setup warn drude dmass 0.4
+    write psf card name output/@resi.drude.psf
+endif
 
-gene @resi setup warn
-
-write psf card name output/@resi.c36.psf
-
-define system sele all show end 
+define system sele all .and. .not. type D* show end 
 
 stop
