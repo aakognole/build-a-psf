@@ -10,7 +10,7 @@ Both c36 and drude residues can be built.
 
 ## Usage:
 
-./run <drude/c36> <resid>
+./run <drude/c36> \<resid\>
 
 e.g.
 
