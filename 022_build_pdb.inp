@@ -10,6 +10,7 @@ if @method eq c36 then
     ic seed 1 @atom1 1 @atom2 1 @atom3
     !ic seed bynu @atom1 bynu @atom2 bynu @atom3
     ic build
+    coor print
 
     mini sd 50
 

@@ -1,2 +1,17 @@
 # build-a-psf
-build psf, crd and pdb for a given residue name using charmm
+
+To build a CHARMM psf, crd and pdb file for a given residue name.
+
+Both c36 and drude residues can be built.
+
+## What you need:
+
+- CHARMM (https://academiccharmm.org/)
+
+## Usage:
+
+./run <drude/c36> <resid>
+
+e.g.
+
+./run c36 benz
